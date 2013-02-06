@@ -10,7 +10,8 @@ package object smirror {
 	val runtimeMirror = scala.reflect.runtime.universe.runtimeMirror(getClass.getClassLoader)
 	def sClassOf[T](typ: Type): SClass[T] =
 		synchronized {
-			val name = typ.typeSymbol.fullName
+			val typeSymbol = typ.typeSymbol
+			val name = typeSymbol.fullName
 			sClassCache.getOrElseUpdate(name, SClass(typ)).asInstanceOf[SClass[T]]
 		}
 	def sClassOf[T: TypeTag]: SClass[T] =
