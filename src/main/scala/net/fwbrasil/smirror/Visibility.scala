@@ -17,16 +17,19 @@ trait Visibility[C] {
 		symbol.isProtected
 	lazy val isPrivate =
 		symbol.isPrivate
+	lazy val isPrivateWithin =
+		privateWithin.isDefined
 	def isVisibleFrom(source: SClass[_]) = {
-		val sourcePackage = source.owner.name.toString.trim
+		val sourcePackage = source.owner.fullName.toString.trim
 		if (privateWithin.isDefined) {
 			val targetPackage = privateWithin.get
 			sourcePackage.startsWith(targetPackage)
-		} else if (isProtected) {
-			ownerSClass.isAssignableFrom(source)
-		} else if (isPrivate) {
+		} else if (isProtected)
+			ownerSClass.packageName == source.packageName ||
+				source.isAssignableFrom(ownerSClass)
+		else if (isPrivate)
 			ownerSClass == source
-		} else
+		else
 			true
 	}
 }

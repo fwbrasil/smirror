@@ -2,7 +2,7 @@ package net.fwbrasil.smirror
 
 import scala.reflect.runtime.universe._
 
-trait SBehavior[C] extends Visibility[C] with TypeParameters {
+trait SBehavior[C] extends Visibility[C] {
 	val owner: SClass[C]
 	def ownerSClass = owner
 	val symbol: MethodSymbol
@@ -33,7 +33,9 @@ trait SBehavior[C] extends Visibility[C] with TypeParameters {
 
 }
 
-case class SConstructor[C](owner: SClass[C], symbol: MethodSymbol) extends SBehavior[C] {
+case class SConstructor[C](owner: SClass[C], symbol: MethodSymbol)
+		extends SBehavior[C] {
+
 	type SParameterType = SConstructorParameter[C]
 	val mirror = owner.mirror.reflectConstructor(symbol)
 	override protected def sParameter(symbol: TermSymbol, index: Int) =
@@ -41,7 +43,9 @@ case class SConstructor[C](owner: SClass[C], symbol: MethodSymbol) extends SBeha
 	def invoke(params: Any*) =
 		mirror.apply(params: _*).asInstanceOf[C]
 }
-case class SMethod[C](owner: SClass[C], symbol: MethodSymbol) extends SBehavior[C] {
+case class SMethod[C](owner: SClass[C], symbol: MethodSymbol)
+		extends SBehavior[C] with TypeParameters {
+
 	type SParameterType = SMethodParameter[C]
 	override protected def sParameter(symbol: TermSymbol, index: Int) =
 		SMethodParameter[C](this, symbol, index)

@@ -7,12 +7,15 @@ case class SClass[C](typ: Type) extends Visibility[C] {
 	val symbol = typ.typeSymbol.asClass
 	def ownerSClass = this
 	val owner = symbol.owner
+	val packageName = owner.fullName.trim
 	val mirror = runtimeMirror.reflectClass(symbol)
 	val javaClassOption =
 		try
 			Option(runtimeMirror.runtimeClass(symbol.toType))
 		catch {
 			case e: NoClassDefFoundError =>
+				None
+			case e: ClassNotFoundException =>
 				None
 		}
 
