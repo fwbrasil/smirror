@@ -6,16 +6,28 @@ import scala.collection.mutable.{ Map => MutableMap }
 package object smirror {
 	val objectSymbol = typeOf[Object].typeSymbol
 	val anySymbol = typeOf[Any].typeSymbol
-	val sClassCache = MutableMap[String, SClass[Any]]()
 	val runtimeMirror = scala.reflect.runtime.universe.runtimeMirror(getClass.getClassLoader)
+	val sClassCache = MutableMap[String, SClass[Any]]()
 	def sClassOf[T](typ: Type): SClass[T] =
 		synchronized {
-			val typeSymbol = typ.typeSymbol
-			val name = typeSymbol.fullName
-			sClassCache.getOrElseUpdate(name, SClass(typ)).asInstanceOf[SClass[T]]
+			try
+				sClassCache.getOrElseUpdate(typ.typeSymbol.fullName, SClass(typ)).asInstanceOf[SClass[T]]
+			catch {
+				case e =>
+					e.printStackTrace()
+					throw e
+			}
 		}
 	def sClassOf[T: TypeTag]: SClass[T] =
 		sClassOf(typeOf[T])
 	def sClassOf[T](clazz: Class[T]): SClass[T] =
 		sClassOf[T](runtimeMirror.classSymbol(clazz).toType)
+
+	implicit class SInstanceImplicit[T: TypeTag](val instance: T) {
+		def reflect =
+			reflectInstance(instance)
+	}
+
+	def reflectInstance[T: TypeTag](instance: T) =
+		SInstance(sClassOf[T], instance)
 }
