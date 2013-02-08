@@ -10,7 +10,7 @@ SMirror is a simpler way to do reflection that provides a higher level of abstra
 LIMITATIONS
 ===========
 
-SMirror usage is not thread safe, since it uses the Scala Reflection that is also not thread safe. The API is a subset of the standard reflection, but is possible to access the symbols and mirrors to use the underlying reflection.
+SMirror usage is not thread-safe, since it uses the Scala Reflection that is also not thread-safe. The API is a subset of the standard reflection, but is possible to access the symbols and mirrors to use the underlying reflection.
 
 BINARIES
 ========
@@ -18,10 +18,6 @@ BINARIES
 Binaries are located at the maven repository:
 
 http://fwbrasil.net/maven
-
-GroupID: net.fwbrasil
-ArtifactID: smirror
-Version: 0.2
 
 SBT repository and dependency configuration:
 
@@ -48,7 +44,7 @@ An example class:
 	     | }
 	defined class Product
 
-Examles of class reflection:
+Examples of class reflection:
 
 	scala> val sClass = sClassOf[Product]
 	sClass: net.fwbrasil.smirror.SClass[Product] = Product
