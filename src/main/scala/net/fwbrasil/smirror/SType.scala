@@ -4,15 +4,13 @@ import scala.reflect.runtime.universe._
 
 trait SType[C] extends Visibility[C] {
 
+    implicit val runtimeMirror: Mirror
     val typ: Type
     val symbol = typ.typeSymbol.asClass
     val isCompanionObject = symbol.isModuleClass
     val owner = this
     val packageName = symbol.owner.fullName.trim
     val mirror: TemplateMirror
-
-    def reflectInstance(instance: C) =
-        SInstance(this, instance)
 
     val javaClassOption =
         try
@@ -85,12 +83,12 @@ trait SType[C] extends Visibility[C] {
 
 }
 
-case class SCompanionClass[C](moduleSymbol: ModuleSymbol, mirror: ModuleMirror, typ: Type) extends SType[C] {
+case class SCompanionClass[C](moduleSymbol: ModuleSymbol, mirror: ModuleMirror, typ: Type)(implicit val runtimeMirror: Mirror) extends SType[C] {
 
-    def this(moduleSymbol: ModuleSymbol, mirror: ModuleMirror) =
+    def this(moduleSymbol: ModuleSymbol, mirror: ModuleMirror)(implicit runtimeMirror: Mirror) =
         this(moduleSymbol, mirror, mirror.symbol.typeSignature)
 
-    def this(moduleSymbol: ModuleSymbol) = this(moduleSymbol, {
+    def this(moduleSymbol: ModuleSymbol)(implicit runtimeMirror: Mirror) = this(moduleSymbol, {
         // A little hack to reflect inner classes without the outer class instance
         Class.forName(runtimeMirror.getClass.getName + "$JavaModuleMirror")
             .getConstructors.head
@@ -98,11 +96,11 @@ case class SCompanionClass[C](moduleSymbol: ModuleSymbol, mirror: ModuleMirror, 
             .asInstanceOf[ModuleMirror]
     })
 
-    val singleton =
-        reflectInstance(mirror.instance.asInstanceOf[C])
+    lazy val singleton =
+        reflectInstance(mirror.instance.asInstanceOf[C], this)
 }
 
-case class SClass[C](typ: Type) extends SType[C] {
+case class SClass[C](typ: Type)(implicit val runtimeMirror: Mirror) extends SType[C] {
 
     val mirror =
         Class.forName(runtimeMirror.getClass.getName + "$JavaClassMirror")
@@ -123,7 +121,7 @@ case class SClass[C](typ: Type) extends SType[C] {
             None
     }
 
-    val companionObjectOption =
+    lazy val companionObjectOption =
         companionSClassOption.map(_.singleton)
 
     val constructorsSymbols = members.collect {

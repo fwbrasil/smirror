@@ -3,6 +3,7 @@ package net.fwbrasil.smirror
 import scala.reflect.runtime.universe._
 
 trait SParameter[C] extends TypeParameters {
+    implicit val runtimeMirror: Mirror
     val owner: SBehavior[C]
     val symbol: TermSymbol
     val index: Int
@@ -21,7 +22,7 @@ trait SParameter[C] extends TypeParameters {
 }
 
 case class SConstructorParameter[C](
-    owner: SConstructor[C], symbol: TermSymbol, index: Int)
+    owner: SConstructor[C], symbol: TermSymbol, index: Int)(implicit val runtimeMirror: Mirror)
         extends SParameter[C] {
     def defaultValueOption = {
         val prefix = "$lessinit$greater"
@@ -31,7 +32,7 @@ case class SConstructorParameter[C](
 }
 
 case class SMethodParameter[C](
-    owner: SMethod[C], symbol: TermSymbol, index: Int)
+    owner: SMethod[C], symbol: TermSymbol, index: Int)(implicit val runtimeMirror: Mirror)
         extends SParameter[C] {
 
     def defaultValueOption(instance: C) = {
