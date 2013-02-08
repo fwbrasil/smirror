@@ -5,7 +5,7 @@ import scala.reflect.runtime.universe._
 trait Visibility[C] {
 
 	def symbol: Symbol
-	def ownerSType: SType[C]
+	def owner: SType[C]
 	lazy val privateWithin =
 		symbol.privateWithin match {
 			case NoSymbol =>
@@ -20,15 +20,15 @@ trait Visibility[C] {
 	lazy val isPrivateWithin =
 		privateWithin.isDefined
 	def isVisibleFrom(source: SType[_]) = {
-		val sourcePackage = source.owner.fullName.toString.trim
+		val sourcePackage = source.packageName
 		if (privateWithin.isDefined) {
 			val targetPackage = privateWithin.get
 			sourcePackage.startsWith(targetPackage)
 		} else if (isProtected)
-			ownerSType.packageName == source.packageName ||
-				source.isAssignableFrom(ownerSType)
+			owner.packageName == source.packageName ||
+				source.isAssignableFrom(owner)
 		else if (isPrivate)
-			ownerSType == source
+			owner == source
 		else
 			true
 	}

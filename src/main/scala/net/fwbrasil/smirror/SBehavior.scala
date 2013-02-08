@@ -4,7 +4,6 @@ import scala.reflect.runtime.universe._
 
 trait SBehavior[C] extends Visibility[C] {
 	val owner: SType[C]
-	def ownerSType = owner
 	val symbol: MethodSymbol
 	val name = symbol.name.toString.trim
 	type SParameterType <: SParameter[C]
@@ -43,6 +42,7 @@ case class SConstructor[C](owner: SClass[C], symbol: MethodSymbol)
 	def invoke(params: Any*) =
 		mirror.apply(params: _*).asInstanceOf[C]
 }
+
 case class SMethod[C](owner: SType[C], symbol: MethodSymbol)
 		extends SBehavior[C] with TypeParameters {
 

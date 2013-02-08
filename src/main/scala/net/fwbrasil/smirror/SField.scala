@@ -6,7 +6,6 @@ trait SField[C] extends Visibility[C] with TypeParameters {
 	val owner: SType[C]
 	val getterSymbol: MethodSymbol
 	val symbol = getterSymbol
-	def ownerSType = owner
 	val typeSignature = symbol.returnType
 	val name = symbol.name.toString.trim
 	lazy val sClass = sClassOf(typeSignature)
