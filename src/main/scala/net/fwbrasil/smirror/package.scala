@@ -9,6 +9,9 @@ package object smirror {
     val anySymbol = typeOf[Any].typeSymbol
     def runtimeMirror(classLoader: ClassLoader) = scala.reflect.runtime.universe.runtimeMirror(classLoader)
     private[smirror] val sClassCache = MutableMap[String, SClass[Any]]()
+    def clearCache = synchronized {
+        sClassCache.clear
+    }
     def sClassOf[T](typ: Type)(implicit runtimeMirror: Mirror): SClass[T] =
         synchronized {
             sClassCache.getOrElseUpdate(typ.typeSymbol.fullName, SClass(typ)(runtimeMirror))
