@@ -3,6 +3,7 @@ package net.fwbrasil
 import scala.reflect.runtime.universe._
 import scala.collection.mutable.{ Map => MutableMap }
 import scala.reflect.macros.Context
+import java.lang.reflect.{ Method => JMethod }
 
 package object smirror {
     val objectSymbol = typeOf[Object].typeSymbol
@@ -21,6 +22,10 @@ package object smirror {
         sClassOf(typeOf[T])
     def sClassOf[T](clazz: Class[T])(implicit runtimeMirror: Mirror): SClass[T] =
         sClassOf[T](runtimeMirror.classSymbol(clazz).toType)
+
+    def sMethod(jMethod: JMethod)(implicit runtimeMirror: Mirror) = {
+        sClassOf(jMethod.getDeclaringClass).methods.find(_.name == jMethod.getName).get
+    }
 
     implicit class SInstanceImplicit[T](val instance: T)(implicit runtimeMirror: Mirror, typeTag: TypeTag[T]) {
         def reflect =
