@@ -19,8 +19,9 @@ object SMirrorBuild extends Build {
 				// publishTo := Option(Resolver.ssh("fwbrasil.net repo", "fwbrasil.net", 8080) as ("maven") withPermissions ("0644")),
 				publishTo <<= version { v: String =>
 				  val nexus = "https://oss.sonatype.org/"
+				  val fwbrasil = "http://fwbrasil.net/maven/"
 				  if (v.trim.endsWith("SNAPSHOT")) 
-				    Some("snapshots" at nexus + "content/repositories/snapshots")
+				    Option(Resolver.ssh("fwbrasil.net repo", "fwbrasil.net", 8080) as("maven") withPermissions("0644"))
 				  else                             
 				    Some("releases" at nexus + "service/local/staging/deploy/maven2")
 				},
@@ -51,7 +52,7 @@ object SMirrorBuild extends Build {
 				),
 				organization := "net.fwbrasil",
 				scalaVersion := "2.10.0",
-				version := "0.4"
+				version := "0.5-SNAPSHOT"
 			)
 		)
 
