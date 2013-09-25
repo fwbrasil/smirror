@@ -11,6 +11,10 @@ trait SParameter[C] extends TypeParameters {
     val typeSignature = symbol.typeSignature
     lazy val sClass = sClassOf[C](typeSignature)
     def isOption = sClass.isOption
+    protected def defaultMethoPrefix: String
+    def defaultValueMethodOption =
+        defaultValueMethod(defaultMethoPrefix, index)
+    def hasDefaultValue = defaultValueMethodOption.isDefined
     protected def defaultValueMethod(prefix: String, index: Int) =
         try
             owner.owner.javaClassOption.map(_.getMethod(prefix + "$default$" + (index + 1)))
@@ -24,20 +28,15 @@ trait SParameter[C] extends TypeParameters {
 case class SConstructorParameter[C](
     owner: SConstructor[C], symbol: TermSymbol, index: Int)(implicit val runtimeMirror: Mirror)
         extends SParameter[C] {
-    def defaultValueOption = {
-        val prefix = "$lessinit$greater"
-        val methodOption = defaultValueMethod(prefix, index)
-        methodOption.map(c => c.invoke(null))
-    }
+    protected def defaultMethoPrefix = "$lessinit$greater"
+    def defaultValueOption =
+        defaultValueMethodOption.map(c => c.invoke(null))
 }
 
 case class SMethodParameter[C](
     owner: SMethod[C], symbol: TermSymbol, index: Int)(implicit val runtimeMirror: Mirror)
         extends SParameter[C] {
-
-    def defaultValueOption(instance: C) = {
-        val prefix = owner.name
-        val methodOption = defaultValueMethod(prefix, index)
-        methodOption.map(c => c.invoke(instance))
-    }
+    protected def defaultMethoPrefix = owner.name
+    def defaultValueOption(instance: C) =
+        defaultValueMethodOption.map(c => c.invoke(instance))
 }
