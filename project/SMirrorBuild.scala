@@ -52,7 +52,7 @@ object SMirrorBuild extends Build {
 				),
 				organization := "net.fwbrasil",
 				scalaVersion := "2.10.0",
-				version := "0.5"
+				version := "0.6"
 			)
 		)
 
