@@ -13,8 +13,17 @@ package object smirror {
     def clearCache = synchronized {
         sClassCache.clear
     }
-    def sClassOf[T](typ: Type)(implicit runtimeMirror: Mirror): SClass[T] =
+    def sClassOf[T](pType: Type)(implicit runtimeMirror: Mirror): SClass[T] =
         synchronized {
+            val typ =
+                pType match {
+                    case typ if (!typ.typeSymbol.isClass) =>
+                        val sym = typ.typeSymbol
+                        val info = sym.getClass.getMethod("info").invoke(sym)
+                        info.getClass.getMethod("hi").invoke(info).asInstanceOf[Type]
+                    case other =>
+                        pType
+                }
             sClassCache.getOrElseUpdate(typ.typeSymbol.fullName, SClass(typ)(runtimeMirror))
                 .asInstanceOf[SClass[T]]
         }
