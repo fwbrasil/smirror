@@ -5,7 +5,7 @@ trait Dummy
 class SFieldSpecTestClass[X <: Dummy](val m1: String) {
     val m2 = "b"
     var m3 = 1
-    var x: Option[X] = _
+    var x: Option[X] = None
 }
 
 class SFieldSpec extends SMirrorSpec {
@@ -13,7 +13,7 @@ class SFieldSpec extends SMirrorSpec {
     "SClass" should "return its fields" in
         test[SFieldSpecTestClass[_]] { (sClass, jClass) =>
             sClass.fields.map(_.name).toSet should
-                equal(Set("m1", "m2", "m3"))
+                equal(Set("x", "m1", "m2", "m3"))
         }
 
     "Vals" should "reflected" in
@@ -34,7 +34,8 @@ class SFieldSpec extends SMirrorSpec {
                 field => (field.name, field.sClass, field.get(instance))
             }
             vars.toSet should equal(Set(
-                ("m3", sClassOf[Int], 1)))
+                ("m3", sClassOf[Int], 1),
+                ("x", sClassOf[Option[_]], None)))
         }
 
     "Vars" should "be modified" in
