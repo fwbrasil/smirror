@@ -39,10 +39,17 @@ class SMethodSpec extends SMirrorSpec {
             val method = sClass.methods.find(_.name == "m7").get
             method.returnType should equal(sClassOf[SMethodSpecTestClass])
         }
+    
     it should "reflect Array[Int] return type" in
         test[SMethodSpecTestClass] { (sClass, jClass) =>
             val method = sClass.methods.find(_.name == "m9").get
             method.returnType should equal(sClassOf[Array[Int]])
+        }
+    
+    it should "reflect the java method" in
+        test[SMethodSpecTestClass] { (sClass, jClass) =>
+            val method = sClass.methods.find(_.name == "m11").get
+            method.javaMethodOption.get === classOf[SMethodSpecTestClass].getMethod("m11")
         }
 
     it should "be invoked without parameter list" in

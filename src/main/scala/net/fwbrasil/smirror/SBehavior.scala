@@ -1,6 +1,8 @@
 package net.fwbrasil.smirror
 
 import scala.reflect.runtime.universe._
+import java.lang.reflect.Method
+import java.lang.reflect.InvocationTargetException
 
 trait SBehavior[C] extends Visibility[C] {
     implicit val runtimeMirror: Mirror
@@ -34,7 +36,7 @@ trait SBehavior[C] extends Visibility[C] {
 }
 
 case class SConstructor[C](owner: SClass[C], symbol: MethodSymbol)(implicit val runtimeMirror: Mirror)
-        extends SBehavior[C] {
+    extends SBehavior[C] {
 
     type SParameterType = SConstructorParameter[C]
     val mirror = owner.mirror.reflectConstructor(symbol)
@@ -45,8 +47,19 @@ case class SConstructor[C](owner: SClass[C], symbol: MethodSymbol)(implicit val 
 }
 
 case class SMethod[C](owner: SType[C], symbol: MethodSymbol)(implicit val runtimeMirror: Mirror)
-        extends SBehavior[C] with TypeParameters {
+    extends SBehavior[C] with TypeParameters {
 
+    val javaMethodOption = {
+        runtimeMirror.getClass.getDeclaredMethods.find(_.getName == "methodToJava").flatMap { method =>
+            try Some(method.invoke(runtimeMirror, symbol).asInstanceOf[Method])
+            catch {
+                case e: InvocationTargetException if (e.getCause.isInstanceOf[NoSuchMethodException]) =>
+                    None
+                case e: InvocationTargetException if (e.getCause.isInstanceOf[ClassNotFoundException]) =>
+                    None
+            }
+        }
+    }
     type SParameterType = SMethodParameter[C]
     override protected def sParameter(symbol: TermSymbol, index: Int) =
         SMethodParameter[C](this, symbol, index)
