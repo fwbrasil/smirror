@@ -27,7 +27,7 @@ trait SParameter[C] extends TypeParameters {
 
 case class SConstructorParameter[C](
     owner: SConstructor[C], symbol: TermSymbol, index: Int)(implicit val runtimeMirror: Mirror)
-        extends SParameter[C] {
+    extends SParameter[C] {
     protected def defaultMethoPrefix = "$lessinit$greater"
     def defaultValueOption =
         defaultValueMethodOption.map(c => c.invoke(null))
@@ -35,7 +35,7 @@ case class SConstructorParameter[C](
 
 case class SMethodParameter[C](
     owner: SMethod[C], symbol: TermSymbol, index: Int)(implicit val runtimeMirror: Mirror)
-        extends SParameter[C] {
+    extends SParameter[C] {
     protected def defaultMethoPrefix = owner.name
     def defaultValueOption(instance: C) =
         defaultValueMethodOption.map(c => c.invoke(instance))

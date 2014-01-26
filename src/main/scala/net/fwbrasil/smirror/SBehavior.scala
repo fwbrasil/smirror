@@ -24,15 +24,20 @@ trait SBehavior[C] extends Visibility[C] {
     protected def sParameter(symbol: TermSymbol, index: Int): SParameterType
     val parameters = parametersGroups.flatten
     val typeSignature = symbol.returnType
-    lazy val returnType = sClassOf(typeSignature)
-
+    lazy val returnType = sClassOf[Any](typeSignature)
     private lazy val toStringParameters =
         parametersGroups.map(_.mkString(", ")).mkString(")(")
 
     override lazy val toString =
         name + "(" + toStringParameters + "): " +
             returnType.name.trim
-
+            
+           protected def safeInvoke[R](f: => R) =
+               try f
+        catch {
+            case e: InvocationTargetException =>
+                throw e.getCause
+        }
 }
 
 case class SConstructor[C](owner: SClass[C], symbol: MethodSymbol)(implicit val runtimeMirror: Mirror)
@@ -43,7 +48,7 @@ case class SConstructor[C](owner: SClass[C], symbol: MethodSymbol)(implicit val 
     override protected def sParameter(symbol: TermSymbol, index: Int) =
         SConstructorParameter[C](this, symbol, index)
     def invoke(params: Any*) =
-        mirror.apply(params: _*).asInstanceOf[C]
+        safeInvoke(mirror.apply(params: _*).asInstanceOf[C])
 }
 
 case class SMethod[C](owner: SType[C], symbol: MethodSymbol)(implicit val runtimeMirror: Mirror)
@@ -60,12 +65,14 @@ case class SMethod[C](owner: SType[C], symbol: MethodSymbol)(implicit val runtim
             }
         }
     }
+    def getAnnotation[A <: java.lang.annotation.Annotation](cls: Class[A]) =
+        javaMethodOption.flatMap(m => Option(m.getAnnotation(cls)))
     type SParameterType = SMethodParameter[C]
     override protected def sParameter(symbol: TermSymbol, index: Int) =
         SMethodParameter[C](this, symbol, index)
     def invoke(obj: C, params: Any*) = {
         val instanceMirror = runtimeMirror.reflect(obj: Any)
         val method = instanceMirror.reflectMethod(symbol)
-        method(params: _*)
+        safeInvoke(method(params: _*))
     }
 }
