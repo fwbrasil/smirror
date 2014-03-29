@@ -21,6 +21,9 @@ trait SBehavior[C] extends Visibility[C] {
         }
         parametersSymbols.map(_.map(sParameter(_, index)))
     }
+    val isAbstract =
+        symbol.asInstanceOf[scala.reflect.internal.Symbols#Symbol]
+            .hasFlag(scala.reflect.internal.Flags.DEFERRED)
     protected def sParameter(symbol: TermSymbol, index: Int): SParameterType
     val parameters = parametersGroups.flatten
     val typeSignature = symbol.returnType
@@ -31,9 +34,9 @@ trait SBehavior[C] extends Visibility[C] {
     override lazy val toString =
         name + "(" + toStringParameters + "): " +
             returnType.name.trim
-            
-           protected def safeInvoke[R](f: => R) =
-               try f
+
+    protected def safeInvoke[R](f: => R) =
+        try f
         catch {
             case e: InvocationTargetException =>
                 throw e.getCause

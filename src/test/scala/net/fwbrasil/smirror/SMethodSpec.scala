@@ -12,10 +12,12 @@ class SMethodSpecTestClass {
 trait Foo {
     @deprecated("foo is a terrible name! what were you thinking?", "0.1")
     def foo(i: Int) = i
+    
+    def abs: Unit
 }
 
 class Bar extends Foo {
-
+	def abs = {}
 }
 
 class SMethodSpec extends SMirrorSpec {
@@ -95,10 +97,18 @@ class SMethodSpec extends SMirrorSpec {
                     List(List("m10"), List("m11")), List(List())))
         }
 
-    it should "reflection annotations" in {
+    it should "reflect annotations" in {
         val jMethod = classOf[Bar].getMethod("foo", classOf[Int])
         sMethod(jMethod).symbol.annotations.map(ann => sClassOf(ann.tpe).name) should
             equal(List("scala.deprecated"))
     }
-
+    
+    it should "reflect isAbstract" in {
+        test[Foo] { (sClass, jClass) =>
+            sClass.methods.filter(_.isAbstract).map(_.name) should equal(List("abs"))
+        }
+        test[Bar] { (sClass, jClass) =>
+            sClass.methods.filter(_.isAbstract) should equal(List())
+        }
+    }
 }
