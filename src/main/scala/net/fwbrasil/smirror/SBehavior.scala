@@ -74,8 +74,12 @@ case class SMethod[C](owner: SType[C], symbol: MethodSymbol)(implicit val runtim
     override protected def sParameter(symbol: TermSymbol, index: Int) =
         SMethodParameter[C](this, symbol, index)
     def invoke(obj: C, params: Any*) = {
-        val instanceMirror = runtimeMirror.reflect(obj: Any)
-        val method = instanceMirror.reflectMethod(symbol)
-        safeInvoke(method(params: _*))
+        lazy val instanceMirror = runtimeMirror.reflect(obj: Any)
+        lazy val method = instanceMirror.reflectMethod(symbol)
+        safeInvoke(
+            javaMethodOption
+                .map(_.invoke(obj, params.asInstanceOf[Seq[Object]]: _*))
+                .getOrElse(method(params: _*))
+        )
     }
 }
