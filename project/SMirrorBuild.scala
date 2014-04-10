@@ -20,7 +20,7 @@ object SMirrorBuild extends Build {
 				publishTo <<= version { v: String =>
 				  val nexus = "https://oss.sonatype.org/"
 				  val fwbrasil = "http://fwbrasil.net/maven/"
-				  if (true || v.trim.endsWith("SNAPSHOT")) 
+				  if (v.trim.endsWith("SNAPSHOT")) 
 				    Option(Resolver.ssh("fwbrasil.net repo", "fwbrasil.net", 8080) as("maven") withPermissions("0644"))
 				  else                             
 				    Some("releases" at nexus + "service/local/staging/deploy/maven2")
@@ -52,7 +52,7 @@ object SMirrorBuild extends Build {
 				),
 				organization := "net.fwbrasil",
 				scalaVersion := "2.10.3",
-				version := "0.8-SNAPSHOT"
+				version := "0.8"
 			)
 		)
 
