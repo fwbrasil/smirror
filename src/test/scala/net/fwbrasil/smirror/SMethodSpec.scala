@@ -2,7 +2,7 @@ package net.fwbrasil.smirror
 
 class SMethodSpecTestClass {
     def m1 = "a"
-    def m2(m3: Int) = m3
+    def m2(@TestAnnotation m3: Int) = m3
     def m4(m5: String, m6: Int) = m5
     def m7(m8: SMethodSpecTestClass) = m8
     def m9(m10: Array[Int])(m11: String) = m10
@@ -109,6 +109,15 @@ class SMethodSpec extends SMirrorSpec {
         }
         test[Bar] { (sClass, jClass) =>
             sClass.methods.filter(_.isAbstract) should equal(List())
+        }
+    }
+    
+    it should "reflect params annotations" in {
+        test[SMethodSpecTestClass] { (sClass, jClass) =>
+            val jMethod = classOf[SMethodSpecTestClass].getMethod("m2", classOf[Int])
+            val method = sClass.methods.find(_.name == "m2").get
+            val annotations = method.getParameterAnnotations.values.head.toList
+            annotations should equal(jMethod.getParameterAnnotations.head.toList)
         }
     }
 }

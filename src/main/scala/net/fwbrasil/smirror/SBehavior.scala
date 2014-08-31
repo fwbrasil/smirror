@@ -70,6 +70,10 @@ case class SMethod[C](owner: SType[C], symbol: MethodSymbol)(implicit val runtim
     }
     def getAnnotation[A <: java.lang.annotation.Annotation](cls: Class[A]) =
         javaMethodOption.flatMap(m => Option(m.getAnnotation(cls)))
+
+    def getParameterAnnotations =
+        parameters.zip(javaMethodOption.get.getParameterAnnotations.map(_.toList)).toMap
+
     type SParameterType = SMethodParameter[C]
     override protected def sParameter(symbol: TermSymbol, index: Int) =
         SMethodParameter[C](this, symbol, index)
