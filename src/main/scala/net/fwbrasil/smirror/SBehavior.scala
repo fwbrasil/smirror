@@ -47,11 +47,21 @@ case class SConstructor[C](owner: SClass[C], symbol: MethodSymbol)(implicit val 
     extends SBehavior[C] {
 
     type SParameterType = SConstructorParameter[C]
-    val mirror = owner.mirror.reflectConstructor(symbol)
     override protected def sParameter(symbol: TermSymbol, index: Int) =
         SConstructorParameter[C](this, symbol, index)
-    def invoke(params: Any*) =
-        safeInvoke(mirror.apply(params: _*).asInstanceOf[C])
+    def invoke(params: Any*): C =
+        params.toList match {
+            case (outer :: params) if (!owner.symbol.isStatic) =>
+                val instanceMirror = runtimeMirror.reflect(outer: Any)
+                val classMirror = instanceMirror.reflectClass(owner.symbol)
+                val constructor = classMirror.reflectConstructor(symbol)
+                println(constructor, params)
+                safeInvoke(constructor.apply(params: _*)).asInstanceOf[C]
+            case params =>
+                val classMirror = runtimeMirror.reflectClass(owner.symbol)
+                val constructor = classMirror.reflectConstructor(symbol)
+                safeInvoke(constructor.apply(params: _*).asInstanceOf[C])
+        }
 }
 
 case class SMethod[C](owner: SType[C], symbol: MethodSymbol)(implicit val runtimeMirror: Mirror)

@@ -10,7 +10,6 @@ trait SType[C] extends Visibility[C, ClassSymbol] {
     val isCompanionObject = symbol.isModuleClass
     val owner = this
     val packageName = symbol.owner.fullName.trim
-    val mirror: TemplateMirror
 
     val javaClassOption =
         try
@@ -82,25 +81,14 @@ case class SCompanionClass[C](moduleSymbol: ModuleSymbol, mirror: ModuleMirror, 
     def this(moduleSymbol: ModuleSymbol, mirror: ModuleMirror)(implicit runtimeMirror: Mirror) =
         this(moduleSymbol, mirror, mirror.symbol.typeSignature)
 
-    def this(moduleSymbol: ModuleSymbol)(implicit runtimeMirror: Mirror) = this(moduleSymbol, {
-        // A little hack to reflect inner classes without the outer class instance
-        Class.forName(runtimeMirror.getClass.getName + "$JavaModuleMirror")
-            .getConstructors.head
-            .newInstance(runtimeMirror, null, moduleSymbol)
-            .asInstanceOf[ModuleMirror]
-    })
+    def this(moduleSymbol: ModuleSymbol)(implicit runtimeMirror: Mirror) =
+        this(moduleSymbol, runtimeMirror.reflectModule(moduleSymbol))
 
     lazy val singleton =
         reflectInstance(mirror.instance.asInstanceOf[C], this)
 }
 
 case class SClass[C](typ: Type)(implicit val runtimeMirror: Mirror) extends SType[C] {
-
-    val mirror =
-        Class.forName(runtimeMirror.getClass.getName + "$JavaClassMirror")
-            .getConstructors.head
-            .newInstance(runtimeMirror, null, symbol)
-            .asInstanceOf[ClassMirror]
 
     val companionSClassOption = {
         val companionSymbol = symbol.companionSymbol
@@ -117,7 +105,7 @@ case class SClass[C](typ: Type)(implicit val runtimeMirror: Mirror) extends STyp
 
     lazy val companionObjectOption =
         companionSClassOption.map(_.singleton)
-        
+
     private val isArray = typ <:< typeOf[Array[_]]
 
     val constructorsSymbols = members.collect {
@@ -125,5 +113,5 @@ case class SClass[C](typ: Type)(implicit val runtimeMirror: Mirror) extends STyp
     }
 
     val constructors = constructorsSymbols.map(SConstructor(this, _))
-
+    
 }

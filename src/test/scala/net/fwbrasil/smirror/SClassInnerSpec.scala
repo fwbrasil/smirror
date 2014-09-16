@@ -15,13 +15,13 @@ class SClassInnerSpec extends SMirrorSpec {
     "A inner SClass" should "invoke constructor" in
         test[SClassInnerSpecTestClass#InnerClass] { (sClass, jClass) =>
             sClass.constructors.head.invoke(instance, "2").m1 should
-                equal(2)
+                equal("2")
         }
 
     "A inner SClass" should "return val" in
         test[SClassInnerSpecTestClass#InnerClass] { (sClass, jClass) =>
             sClass.vals.head.get(inner) should
-                equal(1)
+                equal("1")
         }
 
 }
