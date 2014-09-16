@@ -55,7 +55,6 @@ case class SConstructor[C](owner: SClass[C], symbol: MethodSymbol)(implicit val 
                 val instanceMirror = runtimeMirror.reflect(outer: Any)
                 val classMirror = instanceMirror.reflectClass(owner.symbol)
                 val constructor = classMirror.reflectConstructor(symbol)
-                println(constructor, params)
                 safeInvoke(constructor.apply(params: _*)).asInstanceOf[C]
             case params =>
                 val classMirror = runtimeMirror.reflectClass(owner.symbol)

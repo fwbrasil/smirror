@@ -52,6 +52,7 @@ object SMirrorBuild extends Build {
 				),
 				organization := "net.fwbrasil",
 				scalaVersion := "2.11.2",
+				crossScalaVersions := Seq("2.10.1", "2.11.2"),
 				version := "0.8"
 			)
 		)
