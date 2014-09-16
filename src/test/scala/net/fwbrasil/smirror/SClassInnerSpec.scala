@@ -3,8 +3,8 @@ package net.fwbrasil.smirror
 import scala.reflect.runtime.currentMirror
 
 class SClassInnerSpecTestClass {
-    class InnerClass(val m1: Int)
-    def newInner = new InnerClass(1)
+    class InnerClass(val m1: String)
+    def newInner = new InnerClass("1")
 }
 
 class SClassInnerSpec extends SMirrorSpec {
@@ -14,7 +14,7 @@ class SClassInnerSpec extends SMirrorSpec {
 
     "A inner SClass" should "invoke constructor" in
         test[SClassInnerSpecTestClass#InnerClass] { (sClass, jClass) =>
-            sClass.constructors.head.invoke(instance, 2).m1 should
+            sClass.constructors.head.invoke(instance, "2").m1 should
                 equal(2)
         }
 

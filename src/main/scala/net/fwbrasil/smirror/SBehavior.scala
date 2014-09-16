@@ -4,7 +4,7 @@ import scala.reflect.runtime.universe._
 import java.lang.reflect.Method
 import java.lang.reflect.InvocationTargetException
 
-trait SBehavior[C] extends Visibility[C] {
+trait SBehavior[C] extends Visibility[C, MethodSymbol] {
     implicit val runtimeMirror: Mirror
     val owner: SType[C]
     val symbol: MethodSymbol

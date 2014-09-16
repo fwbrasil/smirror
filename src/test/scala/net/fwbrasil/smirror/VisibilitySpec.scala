@@ -2,7 +2,7 @@ package net.fwbrasil.smirror
 
 class VisibilitySpec extends SMirrorSpec {
 
-    def testPrivatePackage(subject: Visibility[_]) {
+    def testPrivatePackage(subject: Visibility[_, _]) {
         subject.isPrivateWithin should equal(true)
         subject.isPrivate should equal(false)
         subject.isProtected should equal(false)
@@ -11,7 +11,7 @@ class VisibilitySpec extends SMirrorSpec {
         subject.isVisibleFrom(sClassOf[SClassVisibilitySpec]) should equal(true)
     }
 
-    def testPublic(subject: Visibility[_]) {
+    def testPublic(subject: Visibility[_, _]) {
         subject.isPrivateWithin should equal(false)
         subject.isPrivate should equal(false)
         subject.isProtected should equal(false)
@@ -20,7 +20,7 @@ class VisibilitySpec extends SMirrorSpec {
         subject.isVisibleFrom(sClassOf[SClassVisibilitySpec]) should equal(true)
     }
 
-    def testPrivate(subject: Visibility[_]) {
+    def testPrivate(subject: Visibility[_, _]) {
         subject.isPrivateWithin should equal(false)
         subject.isPrivate should equal(true)
         subject.isProtected should equal(false)
@@ -29,7 +29,7 @@ class VisibilitySpec extends SMirrorSpec {
         subject.isVisibleFrom(sClassOf[SClassVisibilitySpec]) should equal(false)
     }
 
-    def testProtected(subject: Visibility[_]) {
+    def testProtected(subject: Visibility[_, _]) {
         subject.isPrivateWithin should equal(false)
         subject.isPrivate should equal(false)
         subject.isProtected should equal(true)
@@ -38,7 +38,7 @@ class VisibilitySpec extends SMirrorSpec {
         subject.isVisibleFrom(sClassOf[SClassVisibilitySpec]) should equal(true)
     }
 
-    def testProtectedPackage(subject: Visibility[_]) {
+    def testProtectedPackage(subject: Visibility[_, _]) {
         subject.isPrivateWithin should equal(true)
         subject.isPrivate should equal(false)
         subject.isProtected should equal(true)

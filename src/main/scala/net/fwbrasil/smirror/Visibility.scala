@@ -2,9 +2,9 @@ package net.fwbrasil.smirror
 
 import scala.reflect.runtime.universe._
 
-trait Visibility[C] {
+trait Visibility[C, S <: Symbol] {
 
-	def symbol: Symbol
+	def symbol: S
 	def owner: SType[C]
 	lazy val privateWithin =
 		symbol.privateWithin match {

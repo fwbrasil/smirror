@@ -4,17 +4,17 @@ import Keys._
 object SMirrorBuild extends Build {
 
 	/* Dependencies */
-	val scalaTest = "org.scalatest" %% "scalatest" % "2.0.M5b" % "test"
+	val scalaTest = "org.scalatest" %% "scalatest" % "2.2.1" % "test"
 
-	val scalaReflect = "org.scala-lang" % "scala-reflect" % "2.10.0"
+	def scalaReflect(scalaVersion: String) = "org.scala-lang" % "scala-reflect" % scalaVersion
 
 	lazy val sMirror =
 		Project(
 			id = "sMirror",
 			base = file("."),
 			settings = Defaults.defaultSettings ++ Seq(
-				libraryDependencies ++=
-					Seq(scalaTest, scalaReflect),
+				libraryDependencies ++= Seq(scalaTest),
+				libraryDependencies <+= scalaVersion(scalaReflect(_)),
 				// publishTo := Some(Resolver.file("file",  new File(Path.userHome.absolutePath+"/.m2/repository"))), 
 				// publishTo := Option(Resolver.ssh("fwbrasil.net repo", "fwbrasil.net", 8080) as ("maven") withPermissions ("0644")),
 				publishTo <<= version { v: String =>
@@ -51,7 +51,7 @@ object SMirrorBuild extends Build {
 				  </developers>
 				),
 				organization := "net.fwbrasil",
-				scalaVersion := "2.10.3",
+				scalaVersion := "2.11.2",
 				version := "0.8"
 			)
 		)

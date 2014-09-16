@@ -2,7 +2,7 @@ package net.fwbrasil.smirror
 
 import scala.reflect.runtime.universe._
 
-trait SType[C] extends Visibility[C] {
+trait SType[C] extends Visibility[C, ClassSymbol] {
 
     implicit val runtimeMirror: Mirror
     val typ: Type
@@ -35,13 +35,7 @@ trait SType[C] extends Visibility[C] {
 
     val termSymbols = members.collect {
         case symbol: TermSymbol => symbol
-    }.map {
-        symbol =>
-            if (symbol.isOverride)
-                symbol.alternatives.map(_.asTerm)
-            else
-                List(symbol)
-    }.flatten
+    }
 
     private def methodOption(symbol: Symbol) =
         if (symbol.isMethod)
@@ -68,7 +62,7 @@ trait SType[C] extends Visibility[C] {
 
     val fields: List[SField[C]] = vars ++ vals
 
-    def isOption = this == sClassOf[Option[_]]
+    def isOption = javaClassOption == Some(classOf[Option[_]])
 
     lazy val baseClassesHierarchyInLinearizationOrder = {
         val classes = typ.baseClasses.filter(_ != symbol)
@@ -123,9 +117,11 @@ case class SClass[C](typ: Type)(implicit val runtimeMirror: Mirror) extends STyp
 
     lazy val companionObjectOption =
         companionSClassOption.map(_.singleton)
+        
+    private val isArray = typ <:< typeOf[Array[_]]
 
     val constructorsSymbols = members.collect {
-        case method: MethodSymbol if (method.isConstructor && method.owner == symbol && !symbol.isTrait) => method
+        case method: MethodSymbol if (!isArray && method.isConstructor && method.owner == symbol && !symbol.isTrait) => method
     }
 
     val constructors = constructorsSymbols.map(SConstructor(this, _))

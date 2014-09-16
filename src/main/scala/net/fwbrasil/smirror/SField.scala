@@ -2,7 +2,7 @@ package net.fwbrasil.smirror
 
 import scala.reflect.runtime.universe._
 
-trait SField[C] extends Visibility[C] with TypeParameters {
+trait SField[C] extends Visibility[C, MethodSymbol] with TypeParameters {
     implicit val runtimeMirror: Mirror
     val owner: SType[C]
     val getterSymbol: MethodSymbol
