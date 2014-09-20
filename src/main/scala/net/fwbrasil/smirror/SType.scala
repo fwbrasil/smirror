@@ -76,16 +76,13 @@ trait SType[C] extends Visibility[C, ClassSymbol] {
 
 }
 
-case class SCompanionClass[C](moduleSymbol: ModuleSymbol, mirror: ModuleMirror, typ: Type)(implicit val runtimeMirror: Mirror) extends SType[C] {
-
-    def this(moduleSymbol: ModuleSymbol, mirror: ModuleMirror)(implicit runtimeMirror: Mirror) =
-        this(moduleSymbol, mirror, mirror.symbol.typeSignature)
+case class SCompanionClass[C](moduleSymbol: ModuleSymbol, typ: Type)(implicit val runtimeMirror: Mirror) extends SType[C] {
 
     def this(moduleSymbol: ModuleSymbol)(implicit runtimeMirror: Mirror) =
-        this(moduleSymbol, runtimeMirror.reflectModule(moduleSymbol))
+        this(moduleSymbol, moduleSymbol.typeSignature)
 
     lazy val singleton =
-        reflectInstance(mirror.instance.asInstanceOf[C], this)
+        reflectInstance(runtimeMirror.reflectModule(moduleSymbol).instance.asInstanceOf[C], this)
 }
 
 case class SClass[C](typ: Type)(implicit val runtimeMirror: Mirror) extends SType[C] {
@@ -113,5 +110,5 @@ case class SClass[C](typ: Type)(implicit val runtimeMirror: Mirror) extends STyp
     }
 
     val constructors = constructorsSymbols.map(SConstructor(this, _))
-    
+
 }
