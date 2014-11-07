@@ -6,7 +6,7 @@ object SMirrorBuild extends Build {
     /* Dependencies */
     val scalaTest = "org.scalatest" %% "scalatest" % "2.2.2" % "test"
 
-    def scalaReflect(scalaVersion: String) = "org.scala-lang" % "scala-reflect" % scalaVersion
+    def scalaReflect(version: String) = "org.scala-lang" % "scala-reflect" % version
 
     lazy val sMirror =
         Project(
@@ -16,11 +16,11 @@ object SMirrorBuild extends Build {
                 scalaVersion := "2.11.4",
                 crossScalaVersions := Seq("2.10.4", "2.11.4"),
                 version := "0.9.1",
-                //libraryDependencies ++= Seq(scalaTest, scalaReflect),
+                // libraryDependencies ++= Seq(scalaTest, scalaReflect),
                 libraryDependencies <++= (scalaVersion) { v: String => Seq(scalaTest, scalaReflect(v)) },
-                publishTo := Some(Resolver.file("file",  file(Path.userHome.absolutePath+"/.m2/repository"))), 
+                // publishTo := Some(Resolver.file("file",  file(Path.userHome.absolutePath+"/.m2/repository"))), 
                 // publishTo := Option(Resolver.ssh("fwbrasil.net repo", "fwbrasil.net", 8080) as ("maven") withPermissions ("0644")),
-                /*
+                //*
                 publishTo <<= version { v: String =>
                     val nexus = "https://oss.sonatype.org/"
                     val fwbrasil = "http://fwbrasil.net/maven/"
