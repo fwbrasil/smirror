@@ -4,18 +4,23 @@ import Keys._
 object SMirrorBuild extends Build {
 
     /* Dependencies */
-    val scalaTest = "org.scalatest" %% "scalatest" % "2.2.1" % "test"
+    val scalaTest = "org.scalatest" %% "scalatest" % "2.2.2" % "test"
 
-    val scalaReflect = "org.scala-lang" % "scala-reflect" % "2.11.2"
+    def scalaReflect(version: String) = "org.scala-lang" % "scala-reflect" % version
 
     lazy val sMirror =
         Project(
             id = "sMirror",
             base = file("."),
             settings = Defaults.defaultSettings ++ Seq(
-                libraryDependencies ++= Seq(scalaTest, scalaReflect),
-                // publishTo := Some(Resolver.file("file",  new File(Path.userHome.absolutePath+"/.m2/repository"))), 
+                scalaVersion := "2.11.4",
+                crossScalaVersions := Seq("2.10.4", "2.11.4"),
+                version := "0.9.1",
+                // libraryDependencies ++= Seq(scalaTest, scalaReflect),
+                libraryDependencies <++= (scalaVersion) { v: String => Seq(scalaTest, scalaReflect(v)) },
+                // publishTo := Some(Resolver.file("file",  file(Path.userHome.absolutePath+"/.m2/repository"))), 
                 // publishTo := Option(Resolver.ssh("fwbrasil.net repo", "fwbrasil.net", 8080) as ("maven") withPermissions ("0644")),
+                //*
                 publishTo <<= version { v: String =>
                     val nexus = "https://oss.sonatype.org/"
                     val fwbrasil = "http://fwbrasil.net/maven/"
@@ -25,6 +30,7 @@ object SMirrorBuild extends Build {
                         Some("releases" at nexus + "service/local/staging/deploy/maven2")
                 },
                 credentials += Credentials(Path.userHome / ".sbt" / "sonatype.credentials"),
+                // */
                 publishMavenStyle := true,
                 publishArtifact in Test := false,
                 pomIncludeRepository := { x => false },
@@ -48,8 +54,6 @@ object SMirrorBuild extends Build {
                             <url>http://fwbrasil.net</url>
                         </developer>
                     </developers>),
-                organization := "net.fwbrasil",
-                scalaVersion := "2.11.2",
-                version := "0.9"))
+                organization := "net.fwbrasil"))
 
 }
