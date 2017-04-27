@@ -17,14 +17,12 @@ SMirror usage is not thread-safe, since it uses the Scala Reflection that is als
 BINARIES
 ========
 
-Binaries are located at the maven repository:
-
-http://fwbrasil.net/maven
+Binaries are located at the JitPack.
 
 SBT repository and dependency configuration:
 
-	resolvers += "fwbrasil" at "http://fwbrasil.net/maven"
-	libraryDependencies += "net.fwbrasil" %% "smirror" % "0.2"
+	resolvers += "jitpack" at "https://jitpack.io"
+	libraryDependencies += "com.github.fwbrasil" % "smirror" % "v0.9"
 
 EXAMPLE USAGE
 =============
